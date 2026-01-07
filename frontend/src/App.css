@@ -1,0 +1,493 @@
+/* ✅ Container Styling */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f3f4f6;
+}
+
+/* ✅ Card Styling */
+.login-card {
+    width: 400px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    background: white;
+}
+
+/* ✅ Title Styling */
+.login-title {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ✅ Form Styling */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* ✅ Input Group Styling */
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-label {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+/* ✅ Role Button Group */
+.role-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+/* ✅ Login Button Styling */
+.login-btn {
+    margin-top: 15px;
+    width: 100%;
+}
+
+/* ✅ Reader Page Styling */
+.reader-container {
+    padding: 20px 40px;
+    background-color: #f9fafb;
+    min-height: 100vh;
+}
+/* ✅ Admin Page Grid Layout */
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 16px;
+}
+
+/* ✅ Info Card Styling */
+.info-card {
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.info-card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.info-card-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.info-card-value {
+  font-size: 20px;
+  margin: 4px 0 0 0;
+}
+
+.info-card-icon {
+  color: #6b7280; /* Gray */
+  font-size: 18px;
+}
+✅ Court Info Page
+
+
+
+.court-container {
+  padding: 30px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.court-info-card,
+.court-members-card {
+  margin: 20px 0;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+}
+
+/* ---- Court Info Grid (screenshot 2 style) ---- */
+.court-info-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.court-info-row {
+  display: contents; /* behave like table row */
+}
+
+.court-info-label {
+  background: #fafafa;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  border-right: 1px solid #f0f0f0;
+  color: #333;
+  font-size: 15px;
+}
+
+.court-info-value {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  border-right: 1px solid #f0f0f0;
+  font-size: 15px;
+  color: #444;
+}
+
+.court-info-description {
+  margin-top: 15px;
+  font-style: italic;
+  color: #555;
+  font-size: 14px;
+}
+
+/* ---- Ant Design Table ---- */
+.ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 700;
+  text-align: center;
+  font-size: 15px;
+}
+
+.ant-table-tbody > tr > td {
+  text-align: center;
+  font-size: 14px;
+  color: #444;
+}
+
+.ant-tabs-nav-list {
+  margin-bottom: 15px;
+}
+
+/* Container styling */
+.container {
+  padding: 24px;
+}
+
+/* Header row styling */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.header-row h1 {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Court name column */
+.court-name small {
+  color: #888;
+}
+
+/* Modal form styling */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* ===== HEADER STYLES ===== */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 80px; /* same as h-20 */
+  padding: 0 2.5rem; /* px-10 = 2.5rem */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* shadow-sm */
+  background-color: #fff;
+}
+
+.header-title {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: bold;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* gap-2 */
+}
+
+.header-divider {
+  background-color: #d1d5db; /* bg-gray-300 */
+}
+/* ===== MEMBER MODAL STYLES ===== */
+.member-modal-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* same as gap-4 */
+}
+
+.member-modal-field label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.member-select {
+  width: 100%; /* same as w-full */
+}
+
+.member-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem; /* same as mt-4 */
+}
+
+/* ===== CREATE REQUEST MODAL STYLES ===== */
+.request-note {
+  font-size: 0.875rem; /* same as text-sm */
+  color: #4b5563; /* text-gray-600 */
+  background-color: #f3f4f6; /* bg-gray-100 */
+  padding: 0.5rem; /* p-2 */
+  border-radius: 0.25rem; /* rounded */
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+/* ===== DOCUMENT MANAGER WRAPPER ===== */
+.document-manager {
+  padding-left: 2.5rem; /* px-10 */
+  padding-right: 2.5rem;
+  padding-top: 1.25rem; /* py-5 */
+  padding-bottom: 1.25rem;
+}
+/* DocumentTable Styles */
+.action-icon {
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.delete-item {
+  color: red;
+}
+/* SampleDownload Component Styles */
+.sample-text {
+  margin-top: 0.5rem; /* same as mt-2 */
+  font-size: 0.875rem; /* same as text-sm */
+  color: #6b7280; /* same as text-gray-500 */
+}
+
+.sample-download-btn {
+  color: #2563eb; /* same as text-blue-600 */
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.sample-download-btn:hover {
+  color: #1d4ed8; /* darker blue on hover */
+}
+
+
+/* Page container */
+.document-preview-page {
+  padding: 30px;
+  max-width: 900px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+}
+
+/* Top-left header */
+.preview-header {
+  text-align: left;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Document Details Card */
+.details-card {
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+
+/* PDF Preview container */
+.pdf-preview-container {
+  display: flex;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 6px;
+  background: #f9f9f9;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 150px;
+  margin-right: 20px;
+}
+
+.sidebar-header {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.sidebar-content {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.thumbnail {
+  padding: 5px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  background: #e0e0e0;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.thumbnail.active {
+  background: #1890ff;
+  color: white;
+  font-weight: bold;
+}
+
+/* Main PDF preview */
+.main-preview {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Back button container */
+.back-button-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* No document text */
+.no-document {
+  text-align: center;
+  font-size: 18px;
+  color: red;
+  margin-top: 50px;
+}
+.document-preview-page {
+  position: relative;
+  min-height: 100vh;
+  background-color: #f8f9fb;
+  padding: 20px;
+  font-family: "Poppins", sans-serif;
+}
+
+.document-header {
+  text-align: left;
+  margin-left: 25px;
+  margin-top: 10px;
+  font-weight: 600;
+  font-size: 1.8rem;
+  color: #222;
+  letter-spacing: 0.5px;
+}
+
+.view-all-btn {
+  position: absolute !important;
+  top: 15px;
+  right: 20px;
+  background-color: white !important;
+  color: black !important;
+  border: 1px solid #000 !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.view-all-btn:hover {
+  background-color: black !important;
+  color: white !important;
+}
+
+.document-card {
+  width: 80%;
+  margin: 60px auto 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  background-color: #fff;
+}
+
+.document-card p {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.back-btn-container {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.no-document {
+  text-align: center;
+  margin-top: 100px;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+.doc-container {
+  padding: 30px;
+}
+
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.doc-header h2 {
+  margin: 0;
+}
+
+.doc-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.status-sent {
+  color: green;
+  font-weight: 500;
+}
+
+.status-pending {
+  color: orange;
+  font-weight: 500;
+}

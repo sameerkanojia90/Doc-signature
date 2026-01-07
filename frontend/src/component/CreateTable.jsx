@@ -1,0 +1,201 @@
+import { Table, Dropdown, Menu, Modal, Input, Button } from "antd";
+import { PlusOutlined, MoreOutlined } from "@ant-design/icons";
+import { useState, useEffect } from "react";
+import MemberModal from "./MemberModel";
+import { useNavigate } from "react-router-dom";
+import "../App.css"; // ✅ Import your custom CSS here
+
+function CreateTable({ onUpdateStats }) {
+  const navigate = useNavigate();
+
+  // Court Modal
+  const [isCourtModalOpen, setIsCourtModalOpen] = useState(false);
+
+  // Member Modal
+  const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
+  const [selectedCourt, setSelectedCourt] = useState(null);
+
+  // Courts Data
+  const [courts, setCourts] = useState([]);
+
+  // Court form state
+  const [courtName, setCourtName] = useState("");
+  const [courtLocation, setCourtLocation] = useState("");
+  const [description, setDescription] = useState("");
+
+  // Fetch courts from backend
+  const fetchCourts = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/court");
+      const data = await res.json();
+      if (data.success) {
+        const formatted = data.data.map((court, index) => ({
+          key: court._id,
+          id: index + 1,
+          name: court.name,
+          location: court.location,
+          Reader: court.readers || 0,
+          Officers: court.officers || 0,
+          Document: 0,
+        }));
+        setCourts(formatted);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourts();
+  }, []);
+
+  const handleDeleteCourt = async (court) => {
+    if (!window.confirm(`Are you sure you want to delete court: ${court.name}?`)) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/court/${court.key}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        fetchCourts(); // refresh table
+        if (onUpdateStats) onUpdateStats();
+      } else {
+        alert(data.message || "Error deleting court");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    }
+  };
+
+  // Table action menu
+  const menu = (court) => (
+    <Menu>
+      <Menu.Item key="1" onClick={() => { setSelectedCourt(court); setIsMemberModalOpen(true); }}>
+        Create Member
+      </Menu.Item>
+      <Menu.Item key="2" onClick={() => navigate(`/court/${court.key}`)}>Show Info</Menu.Item>
+      <Menu.Item key="3" style={{ backgroundColor: "red", color: "white" }} onClick={() => handleDeleteCourt(court)}>
+        Delete
+      </Menu.Item>
+    </Menu>
+  );
+
+  const columns = [
+    { title: "NO.", dataIndex: "id", key: "id" },
+    {
+      title: "Court Name",
+      key: "name",
+      render: (_, record) => (
+        <div className="court-name">
+          <strong>{record.name}</strong>
+          <br />
+          <small>{record.location}</small>
+        </div>
+      )
+    },
+    { title: "Reader", dataIndex: "Reader", key: "Reader" },
+    { title: "Officers", dataIndex: "Officers", key: "Officers" },
+    { title: "Document Signed", dataIndex: "Document", key: "Document" },
+    {
+      title: "Action",
+      key: "Action",
+      render: (_, record) => (
+        <Dropdown overlay={menu(record)} trigger={["click"]}>
+          <MoreOutlined rotate={90} style={{ fontSize: "20px", cursor: "pointer" }} />
+        </Dropdown>
+      ),
+    },
+  ];
+
+  const handleCourtSubmit = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/court", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: courtName, location: courtLocation, description }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsCourtModalOpen(false);
+        setCourtName(""); setCourtLocation(""); setDescription("");
+        fetchCourts();
+        if (onUpdateStats) onUpdateStats();
+      } else {
+        alert(data.message || "Error creating court");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    }
+  };
+
+  const handleMemberSubmit = async ({ email, pass, role }) => {
+    try {
+      if (!selectedCourt) return alert("Court not selected");
+      if (!email) return alert("Email is required");
+      if (!pass) return alert("Password is required");
+
+      const res = await fetch(`http://localhost:5000/court/${selectedCourt.key}/member`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, pass, role }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setIsMemberModalOpen(false);
+        fetchCourts();
+        if (onUpdateStats) onUpdateStats();
+      } else {
+        alert(data.message || "Error adding member");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    }
+  };
+
+  return (
+    <div className="container">
+      <div className="header-row">
+        <h1>Court Overview</h1>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsCourtModalOpen(true)}>
+          Add Court
+        </Button>
+      </div>
+
+      <Table columns={columns} dataSource={courts} pagination={false} bordered />
+
+      {/* Add Court Modal */}
+      <Modal
+        title="Add New Court"
+        open={isCourtModalOpen}
+        onCancel={() => setIsCourtModalOpen(false)}
+        footer={null}
+      >
+        <div className="form-container">
+          <Input placeholder="Court Name" value={courtName} onChange={(e) => setCourtName(e.target.value)} />
+          <Input placeholder="Location" value={courtLocation} onChange={(e) => setCourtLocation(e.target.value)} />
+          <Input.TextArea placeholder="Description" rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
+        </div>
+        <div className="modal-actions">
+          <Button onClick={() => setIsCourtModalOpen(false)}>Cancel</Button>
+          <Button type="primary" onClick={handleCourtSubmit}>Submit</Button>
+        </div>
+      </Modal>
+
+      {/* Member Modal */}
+      <MemberModal
+        visible={isMemberModalOpen}
+        onClose={() => setIsMemberModalOpen(false)}
+        court={selectedCourt}
+        onSubmit={handleMemberSubmit}
+      />
+    </div>
+  );
+}
+
+export default CreateTable;
