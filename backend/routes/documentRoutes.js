@@ -10,7 +10,7 @@ const {
 
 router.get("/", getAllRequests);
 router.post("/", uploadFile, createRequest);
-router.delete("/:id", deleteRequest); // 🗑 Delete route
-router.put("/:id", updateRequest); // ✏️ Edit route
+router.delete("/:id", deleteRequest); 
+router.put("/:id", updateRequest); 
 
 module.exports = router;

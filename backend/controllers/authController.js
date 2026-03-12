@@ -18,7 +18,7 @@ exports.login = async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 };
-
+//court  create
 exports.court = async (req, res) => {
     try {
         const { name, location, description } = req.body;
@@ -54,7 +54,7 @@ exports.court = async (req, res) => {
         });
     }
 }
-
+//count get courts
 exports.getCourts = async (req, res) => {
     try {
         const courts = await Court.find();
@@ -163,10 +163,14 @@ exports.deleteCourt = async (req, res) => {
         await Court.findByIdAndDelete(id);
         await User.deleteMany({ courtId: id });
 
-        res.json({ success: true, message: "Court and its members delete successfully" });
+        res.json({ 
+            success: true,
+             message: "Court and its members delete successfully" });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, message: "Error deleting court" });
+        res.status(500).json(
+            { success: false,
+                 message: "Error deleting court" });
     }
 }
 exports.getCourtById = async (req, res) => {
@@ -174,7 +178,9 @@ exports.getCourtById = async (req, res) => {
         const { id } = req.params;
         const court = await Court.findById(id);
         if (!court) {
-            return res.status(404).json({ success: false, message: "Court not found" });
+            return res.status(404).json
+            ({ success: false,
+                 message: "Court not found" });
         }
 
         const members = await User.find({ courtId: id }).select("email role -_id");

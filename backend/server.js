@@ -5,6 +5,7 @@ const port = process.env.PORT || 5000;
 const app = express();
 const cors = require('cors');
 const connectdb = require("./config/mongoDB");
+
 const authRoutes = require("./routes/admin");
 const documentRoutes = require("./routes/documentRoutes");
 const uploadDir = "./uploads";
