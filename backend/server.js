@@ -11,7 +11,7 @@ const uploadDir = "./uploads";
 
 connectdb();
 
-// Middleware
+
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));

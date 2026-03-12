@@ -4,6 +4,8 @@ const fs = require("fs");
 const path = require("path");
 const XLSX = require("xlsx");
 const mammoth = require("mammoth");
+
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = "./uploads";
@@ -19,7 +21,9 @@ const upload = multer({ storage }).single("templateFile");
 
 exports.uploadFile = (req, res, next) => {
   upload(req, res, (err) => {
-    if (err) return res.status(400).json({ success: false, message: err.message });
+    if (err) return res.status(400).json(
+      { success: false,
+         message: err.message });
     next();
   });
 };
@@ -29,10 +33,14 @@ exports.createRequest = async (req, res) => {
     const { title, description, createdById, createrRole } = req.body;
 
     if (!req.file) {
-      return res.status(400).json({ success: false, message: "Template file is required" });
+      return res.status(400).json
+      ({ success: false,
+         message: "Template file is required"
+         });
     }
 
-    const { value: fileContent } = await mammoth.extractRawText({ path: req.file.path });
+    const { value: fileContent } = await mammoth.extractRawText
+    ({ path: req.file.path });
 
     const placeholders = [...fileContent.matchAll(/{(.*?)}/g)].map(
       (match) => `{${match[1].trim()}}`

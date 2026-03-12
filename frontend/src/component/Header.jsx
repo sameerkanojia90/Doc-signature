@@ -1,7 +1,7 @@
 import { Divider, Button } from "antd";
 import { LuBell } from "react-icons/lu";
 import { useLocation, useNavigate } from "react-router-dom";
-import "../App.css"; // ✅ import CSS
+import "../App.css"; 
 
 function Header() {
     const location = useLocation();
@@ -23,14 +23,12 @@ function Header() {
                 <LuBell size={22} />
                 <Divider type="vertical" className="header-divider" />
 
-                {/* Back Button (Court Info page par) */}
                 {isCourtInfo && (
                     <Button type="primary" onClick={() => navigate(-1)}>
                         Back
                     </Button>
                 )}
 
-                {/* Logout Button (Admin side par) */}
                 {isAdmin && (
                     <Button danger onClick={handleLogout}>
                         Logout

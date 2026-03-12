@@ -1,13 +1,12 @@
 const API_BASE = "http://localhost:5000/api/requests";
 
-// Get all requests
 export async function getAllRequests() {
   const res = await fetch(API_BASE);
   if (!res.ok) throw new Error("Failed to fetch requests");
   return res.json();
 }
 
-// Create new request
+
 export async function createRequest(values) {
   const formData = new FormData();
   formData.append("title", values.title);
@@ -16,7 +15,7 @@ export async function createRequest(values) {
   formData.append("createrRole", 1);
 
   if (values.file && values.file[0]) {
-    formData.append("templateFile", values.file[0].originFileObj); // ✅ corrected field name
+    formData.append("templateFile", values.file[0].originFileObj);
   }
 
   const res = await fetch(API_BASE, {

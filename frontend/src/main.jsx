@@ -8,7 +8,7 @@ import Reader from './pages/Reader.jsx';
 import Officer from './pages/Officers.jsx';
 import CourtInfo from './component/CourtInfo.jsx';
 import DocumentPreview from './component/reader/DocumentPreview.jsx';
-import NewDocDocuments from './component/reader/NewDocDocuments.jsx'; // ✅ added import
+import NewDocDocuments from './component/reader/NewDocDocuments.jsx'; 
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -19,8 +19,8 @@ createRoot(document.getElementById('root')).render(
         <Route path='/reader' element={<Reader />} />
         <Route path='/officer' element={<Officer />} />
         <Route path='/court/:id' element={<CourtInfo />} />
-        <Route path='/document-preview' element={<DocumentPreview />} /> {/* ✅ Existing route */}
-        <Route path='/newdocdocuments' element={<NewDocDocuments />} />   {/* ✅ New route added */}
+        <Route path='/document-preview' element={<DocumentPreview />} /> 
+        <Route path='/newdocdocuments' element={<NewDocDocuments />} />  
       </Routes>
     </BrowserRouter>
   </StrictMode>

@@ -75,7 +75,6 @@ function DocumentManager() {
     }
   };
 
-  // ✅ Delete request handler
   const handleDelete = async (id) => {
     try {
       const res = await fetch(`http://localhost:5000/api/requests/${id}`, {

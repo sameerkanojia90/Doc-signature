@@ -78,7 +78,7 @@ function DocumentTable({ data, onDelete }) {
       columns={columns}
       dataSource={data}
       bordered
-      pagination={{ pageSize: 5 }} // <-- Add pagination here
+      pagination={{ pageSize: 5 }} 
     />
   );
 }

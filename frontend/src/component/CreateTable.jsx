@@ -3,27 +3,23 @@ import { PlusOutlined, MoreOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import MemberModal from "./MemberModel";
 import { useNavigate } from "react-router-dom";
-import "../App.css"; // ✅ Import your custom CSS here
+import "../App.css"; 
 
 function CreateTable({ onUpdateStats }) {
   const navigate = useNavigate();
 
-  // Court Modal
+ 
   const [isCourtModalOpen, setIsCourtModalOpen] = useState(false);
 
-  // Member Modal
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
   const [selectedCourt, setSelectedCourt] = useState(null);
 
-  // Courts Data
   const [courts, setCourts] = useState([]);
 
-  // Court form state
   const [courtName, setCourtName] = useState("");
   const [courtLocation, setCourtLocation] = useState("");
   const [description, setDescription] = useState("");
 
-  // Fetch courts from backend
   const fetchCourts = async () => {
     try {
       const res = await fetch("http://localhost:5000/court");
@@ -59,7 +55,7 @@ function CreateTable({ onUpdateStats }) {
 
       const data = await res.json();
       if (data.success) {
-        fetchCourts(); // refresh table
+        fetchCourts(); 
         if (onUpdateStats) onUpdateStats();
       } else {
         alert(data.message || "Error deleting court");
@@ -70,7 +66,7 @@ function CreateTable({ onUpdateStats }) {
     }
   };
 
-  // Table action menu
+
   const menu = (court) => (
     <Menu>
       <Menu.Item key="1" onClick={() => { setSelectedCourt(court); setIsMemberModalOpen(true); }}>

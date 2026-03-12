@@ -2,9 +2,18 @@ const mongoose = require("mongoose");
 
 const CourtSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    location: { type: String, required: true },
-    description: { type: String },
+    name:
+    {
+      type: String,
+      required: true
+    },
+    location:
+    {
+      type: String,
+      required: true
+    },
+    description:
+      { type: String },
   },
   { timestamps: true }
 );

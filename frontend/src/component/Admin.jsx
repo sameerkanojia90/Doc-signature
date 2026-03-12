@@ -3,7 +3,7 @@ import Header from "./Header";
 import Table from "./CreateTable";
 import { Card } from "antd";
 import { FaArrowRight } from "react-icons/fa";
-import "../App.css"; // ✅ Import global styles
+import "../App.css";
 
 function InfoCard({ title, value }) {
   return (

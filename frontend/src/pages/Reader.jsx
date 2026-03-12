@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button, message, Upload } from "antd";
 import CreateRequestModal from "../component/reader/CreateRequestModel";
@@ -9,7 +8,6 @@ function Reader() {
   const [visible, setVisible] = useState(false);
   const [documents, setDocuments] = useState([]);
 
-  // ---------------- Fetch all requests ----------------
   const fetchRequests = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/requests");
@@ -40,7 +38,6 @@ function Reader() {
     fetchRequests();
   }, []);
 
-  // ---------------- Handle create request ----------------
   const handleCreate = async (values) => {
     try {
       if (!values.file || values.file.length === 0) {
@@ -48,7 +45,7 @@ function Reader() {
       }
 
       const fileObj = values.file[0];
-      const file = fileObj.originFileObj || fileObj; // fallback for AntD Upload
+      const file = fileObj.originFileObj || fileObj; 
 
       if (!file || !file.name) {
         return message.error("Invalid file selected");
@@ -63,8 +60,8 @@ function Reader() {
       formData.append("title", values.title || "");
       formData.append("description", values.description || "");
       formData.append("templateFile", file);
-      formData.append("createdById", "123"); // Replace with actual user ID
-      formData.append("createrRole", "reader"); // Replace with actual role
+      formData.append("createdById", "123"); 
+      formData.append("createrRole", "reader"); 
 
       const res = await fetch("http://localhost:5000/api/requests", {
         method: "POST",
@@ -80,8 +77,8 @@ function Reader() {
 
       if (data.success) {
         message.success("Request created successfully");
-        fetchRequests(); // Refresh table
-        setVisible(false); // Close modal
+        fetchRequests(); 
+        setVisible(false);
       } else {
         message.error(data.message || "Something went wrong");
       }

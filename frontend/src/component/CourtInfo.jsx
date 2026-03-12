@@ -50,33 +50,7 @@ function CourtInfo() {
     <>
       <Header />
       <div className="court-container">
-        {/* <Card className="court-info-card" title="Court Information">
-          <table className="court-info-table">
-            <tbody>
-              <tr>
-                <td>Name</td>
-                <td>{court.name}</td>
-                <td>Location</td>
-                <td>{court.location}</td>
-                <td>Documents Not Signed</td>
-                <td>{court.documentsNotSigned}</td>
-              </tr>
-              <tr>
-                <td>Total Officers</td>
-                <td>{court.officersCount}</td>
-                <td>Total Readers</td>
-                <td>{court.readersCount}</td>
-                <td>Documents Signed</td>
-                <td>{court.documentsSigned}</td>
-              </tr>
-              <tr>
-                <td colSpan={6}>
-                  Description: {court.description || "No description available"}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </Card> */}
+      
 
     <Card className="court-info-card" title="Court Information">
   <div className="court-info-grid">

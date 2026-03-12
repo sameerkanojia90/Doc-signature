@@ -1,14 +1,13 @@
 import { Card, Input, Button } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons"; // 👈 icons import
-import "../App.css"; // ✅ CSS file import
-
+import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons"; 
+import "../App.css"; 
 function Login() {
     const [role, setRole] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false); // 👈 password toggle state
+    const [showPassword, setShowPassword] = useState(false); 
     const navigate = useNavigate();
 
     const API = "http://localhost:5000/login";
@@ -56,7 +55,7 @@ function Login() {
                         <label className="input-label">Enter Password</label>
                         <Input
                             placeholder="Enter Password"
-                            type={showPassword ? "text" : "password"} // 👈 toggle type
+                            type={showPassword ? "text" : "password"} 
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             suffix={

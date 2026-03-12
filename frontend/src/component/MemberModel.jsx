@@ -1,6 +1,6 @@
 import { Modal, Input, Button, Select } from "antd";
 import { useState } from "react";
-import "../App.css"; // ✅ Import CSS
+import "../App.css"; 
 
 const { Option } = Select;
 
