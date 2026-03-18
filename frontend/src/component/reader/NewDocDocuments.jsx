@@ -23,7 +23,9 @@ function NewDocDocuments() {
   const [officerMap, setOfficerMap] = useState({});
 
   useEffect(() => {
-    fetch("http://localhost:5000/admin/courts-officers")
+    fetch("http://localhost:5000/admin/courts-officers" , {
+      credentials:"include",
+    } )
       .then((res) => res.json())
       .then((data) => {
         setCourtList(data.courts);

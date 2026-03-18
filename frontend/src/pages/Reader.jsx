@@ -10,7 +10,9 @@ function Reader() {
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/requests");
+      const res = await fetch("http://localhost:5000/api/requests" , {
+        credentials:"include",
+      }   );
       const data = await res.json();
       if (data.success) {
         setDocuments(
@@ -38,55 +40,44 @@ function Reader() {
     fetchRequests();
   }, []);
 
-  const handleCreate = async (values) => {
-    try {
-      if (!values.file || values.file.length === 0) {
-        return message.error("Please select a template file (.docx)");
-      }
-
-      const fileObj = values.file[0];
-      const file = fileObj.originFileObj || fileObj; 
-
-      if (!file || !file.name) {
-        return message.error("Invalid file selected");
-      }
-
-      const ext = file.name.split(".").pop().toLowerCase();
-      if (ext !== "docx") {
-        return message.error("Only .docx files are allowed");
-      }
-
-      const formData = new FormData();
-      formData.append("title", values.title || "");
-      formData.append("description", values.description || "");
-      formData.append("templateFile", file);
-      formData.append("createdById", "123"); 
-      formData.append("createrRole", "reader"); 
-
-      const res = await fetch("http://localhost:5000/api/requests", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.error("Backend error:", data);
-        return message.error(data.message || "Bad request");
-      }
-
-      if (data.success) {
-        message.success("Request created successfully");
-        fetchRequests(); 
-        setVisible(false);
-      } else {
-        message.error(data.message || "Something went wrong");
-      }
-    } catch (err) {
-      console.error(err);
-      message.error("Something went wrong");
+const handleCreate = async (values) => {
+  try {
+    if (!values.file || values.file.length === 0) {
+      return message.error("Please select a template file (.docx)");
     }
-  };
+
+    const file = values.file[0].originFileObj;
+
+    if (!file) {
+      return message.error("File not found");
+    }
+
+    const formData = new FormData();
+    formData.append("title", values.title);
+    formData.append("description", values.description);
+    formData.append("templateFile", file);
+
+    const res = await fetch("http://localhost:5000/api/requests", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
+
+    const data = await res.json();
+    console.log("UPLOAD RESPONSE:", data);
+
+    if (data.success) {
+      message.success("Request created successfully");
+      fetchRequests();
+      setVisible(false);
+    } else {
+      message.error(data.message || "Upload failed");
+    }
+  } catch (err) {
+    console.error(err);
+    message.error("Something went wrong");
+  }
+};
 
   return (
     <div className="reader-container">

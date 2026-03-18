@@ -14,7 +14,7 @@ function DocumentTable({ data, onDelete }) {
       okText: "Yes, Delete",
       cancelText: "Cancel",
       okType: "danger",
-      onOk: () => onDelete(record.key),
+      onOk: () => onDelete(record.id),
     });
   };
 

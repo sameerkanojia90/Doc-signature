@@ -2,15 +2,18 @@ const express = require("express");
 const router = express.Router();
 
 const authController = require("../controllers/authController");
-const { isAuthenticated } = require("../middleware/auth");
+const { isAuthenticated, authorizeRoles } = require("../middleware/auth");
 
 router.post("/login", authController.login);
 
-router.post("/court", isAuthenticated, authController.court);
-router.get("/court", isAuthenticated, authController.getCourts);
-router.post("/court/:courtId/member", isAuthenticated, authController.addMember);
-router.get("/admin/stats", isAuthenticated, authController.stateUpdate);
-router.delete("/court/:id", isAuthenticated, authController.deleteCourt);
+router.post("/court", isAuthenticated, authorizeRoles("Admin"), authController.court);
+router.get("/admin/stats", isAuthenticated, authorizeRoles("Admin"), authController.stateUpdate);
+router.delete("/court/:id", isAuthenticated, authorizeRoles("Admin"), authController.deleteCourt);
+
+router.get("/court", isAuthenticated, authorizeRoles("Admin", "Officer"), authController.getCourts);
+
 router.get("/court/:id", isAuthenticated, authController.getCourtById);
+
+router.post("/court/:courtId/member", isAuthenticated, authorizeRoles("Admin"), authController.addMember);
 
 module.exports = router;
