@@ -16,25 +16,37 @@ function Login() {
         setRole(selectedRole);
     }
 
-    async function handleLogin() {
+   async function handleLogin() {
+    try {
         const res = await fetch(API, {
+            credentials: "include",
             method: "POST",
+            
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password, role }),
         });
+
         const data = await res.json();
         console.log("Login Response:", data);
 
-        if (data.success && role === "Admin") {
-            navigate("/admin");
-        } else if (data.success && role === "Officer") {
-            navigate("/Officer");
-        } else if (data.success && role === "Reader") {
-            navigate("/Reader");
-        } else if (!data.success) {
-            alert("Invalid credentials");
+        if (data.success) {
+            const userRole = data.user.role;
+
+            if (userRole === "Admin") {
+                navigate("/admin");
+            } else if (userRole === "Officer") {
+                navigate("/Officer");
+            } else if (userRole === "Reader") {
+                navigate("/Reader");
+            }
+        } else {
+            alert(data.message || "Login failed");
         }
+    } catch (err) {
+        console.error(err);
+        alert("Server error");
     }
+}
 
     return (
         <div className="login-container">

@@ -1,4 +1,3 @@
-/* ✅ Container Styling */
 .login-container {
     display: flex;
     justify-content: center;
@@ -15,7 +14,6 @@
     background: white;
 }
 
-/* ✅ Title Styling */
 .login-title {
     font-size: 24px;
     font-weight: 600;
@@ -23,14 +21,12 @@
     margin-bottom: 20px;
 }
 
-/* ✅ Form Styling */
 .login-form {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-/* ✅ Input Group Styling */
 .input-group {
     display: flex;
     flex-direction: column;
@@ -41,26 +37,22 @@
     font-weight: 500;
 }
 
-/* ✅ Role Button Group */
 .role-buttons {
     display: flex;
     gap: 10px;
     margin-top: 5px;
 }
 
-/* ✅ Login Button Styling */
 .login-btn {
     margin-top: 15px;
     width: 100%;
 }
 
-/* ✅ Reader Page Styling */
 .reader-container {
     padding: 20px 40px;
     background-color: #f9fafb;
     min-height: 100vh;
 }
-/* ✅ Admin Page Grid Layout */
 .admin-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -68,7 +60,7 @@
   padding: 16px;
 }
 
-/* ✅ Info Card Styling */
+/* Info Card Styling */
 .info-card {
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
   border-radius: 10px;
@@ -102,7 +94,6 @@
   color: #6b7280; /* Gray */
   font-size: 18px;
 }
-✅ Court Info Page
 
 
 
@@ -114,7 +105,7 @@
 
 .court-info-card,
 .court-members-card {
-  margin: 20px 0;
+  margin-bottom: 60px;
   border-radius: 12px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
   padding: 20px;
@@ -218,32 +209,31 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  height: 80px; /* same as h-20 */
-  padding: 0 2.5rem; /* px-10 = 2.5rem */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* shadow-sm */
+  width: 96%;
+  height: 80px; 
+  padding: 0 2.5rem; 
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
   background-color: #fff;
 }
 
 .header-title {
-  font-size: 1.5rem; /* text-2xl */
+  font-size: 1.5rem; 
   font-weight: bold;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* gap-2 */
+  gap: 0.5rem; 
 }
 
 .header-divider {
-  background-color: #d1d5db; /* bg-gray-300 */
+  background-color: #d1d5db; 
 }
-/* ===== MEMBER MODAL STYLES ===== */
 .member-modal-container {
   display: flex;
   flex-direction: column;
-  gap: 1rem; /* same as gap-4 */
+  gap: 1rem; 
 }
 
 .member-modal-field label {
@@ -253,31 +243,30 @@
 }
 
 .member-select {
-  width: 100%; /* same as w-full */
+  width: 100%; 
 }
 
 .member-modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
-  margin-top: 1rem; /* same as mt-4 */
+  margin-top: 1rem; 
 }
 
-/* ===== CREATE REQUEST MODAL STYLES ===== */
 .request-note {
-  font-size: 0.875rem; /* same as text-sm */
-  color: #4b5563; /* text-gray-600 */
-  background-color: #f3f4f6; /* bg-gray-100 */
+  font-size: 0.875rem; 
+  color: #4b5563; 
+  background-color: #f3f4f6;
   padding: 0.5rem; /* p-2 */
-  border-radius: 0.25rem; /* rounded */
+  border-radius: 0.25rem; 
   margin-top: 0.5rem;
   line-height: 1.4;
 }
 /* ===== DOCUMENT MANAGER WRAPPER ===== */
 .document-manager {
-  padding-left: 2.5rem; /* px-10 */
+  padding-left: 2.5rem; 
   padding-right: 2.5rem;
-  padding-top: 1.25rem; /* py-5 */
+  padding-top: 1.25rem;
   padding-bottom: 1.25rem;
 }
 /* DocumentTable Styles */
@@ -291,13 +280,12 @@
 }
 /* SampleDownload Component Styles */
 .sample-text {
-  margin-top: 0.5rem; /* same as mt-2 */
-  font-size: 0.875rem; /* same as text-sm */
-  color: #6b7280; /* same as text-gray-500 */
-}
+  margin-top: 0.5rem;
+  font-size: 0.875rem; 
+  color: #6b7280; }
 
 .sample-download-btn {
-  color: #2563eb; /* same as text-blue-600 */
+  color: #2563eb;
   text-decoration: underline;
   background: none;
   border: none;
@@ -307,7 +295,7 @@
 }
 
 .sample-download-btn:hover {
-  color: #1d4ed8; /* darker blue on hover */
+  color: #1d4ed8; 
 }
 
 
@@ -382,13 +370,11 @@
   align-items: center;
 }
 
-/* Back button container */
 .back-button-container {
   text-align: center;
   margin-top: 20px;
 }
 
-/* No document text */
 .no-document {
   text-align: center;
   font-size: 18px;

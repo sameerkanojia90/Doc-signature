@@ -16,7 +16,9 @@ function CourtInfo() {
   useEffect(() => {
     const fetchCourt = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/court/${id}`);
+        const res = await fetch(`http://localhost:5000/court/${id}`, {
+  credentials: "include"   
+});
         const data = await res.json();
         if (data.success) setCourt(data.data);
       } catch (err) {

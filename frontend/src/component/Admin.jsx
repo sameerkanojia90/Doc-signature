@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
-import Table from "./CreateTable";
+import CreateTable from "./CreateTable";
 import { Card } from "antd";
 import { FaArrowRight } from "react-icons/fa";
 import "../App.css";
@@ -29,9 +29,12 @@ function Admin() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch("http://localhost:5000/admin/stats");
+     const res = await fetch("http://localhost:5000/admin/stats", {
+  credentials: "include"
+});
       const data = await res.json();
-      setStats(data);
+      console.log(data);
+      setStats(data.data || data);
     } catch (err) {
       console.error("Error fetching stats:", err);
     }
@@ -42,10 +45,10 @@ function Admin() {
   }, []);
 
   const cardsData = [
-    { title: "Courts", value: stats.courts },
-    { title: "Reader", value: stats.readers },
-    { title: "Officers", value: stats.officers },
-    { title: "Document Signed", value: stats.signedDocs },
+    { title: "Courts", value: stats.courts || 0 },
+    { title: "Reader", value: stats.readers || 0 },
+    { title: "Officers", value: stats.officers || 0 },
+    { title: "Document Signed", value: stats.signedDocs || 0 },
   ];
 
   return (
@@ -56,7 +59,7 @@ function Admin() {
           <InfoCard key={index} title={card.title} value={card.value} />
         ))}
       </div>
-      <Table onUpdateStats={fetchStats} />
+      <CreateTable onUpdateStats={fetchStats} />
     </>
   );
 }

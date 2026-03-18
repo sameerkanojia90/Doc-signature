@@ -1,13 +1,17 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 require("dotenv").config();
+const seedAdmin = require("./admin");
 
-const connectdb = async()=>{
-    try{
+const connectdb = async () => {
+    try {
         await mongoose.connect(process.env.MONGO_URI);
-        console.log("MongoDB Connected Sucessfully");
-    } catch(error){
+        console.log("MongoDB Connected");
+
+        await seedAdmin(); 
+
+    } catch (error) {
         console.log(error);
     }
-}
+};
 
 module.exports = connectdb;

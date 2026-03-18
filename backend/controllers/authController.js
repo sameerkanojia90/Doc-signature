@@ -2,23 +2,47 @@ require('dotenv').config();
 const User = require("../models/User");
 const Court = require("../models/Court");
 const nodemailer = require("nodemailer");
+const bcrypt = require('bcrypt');
 
 exports.login = async (req, res) => {
     try {
-        const { email, pass, role } = req.body;
-        console.log(req.body);
+        const { email, password, role } = req.body;
 
-        const user = await User.find({ email, pass, role });
+        const user = await User.findOne({ email });
+
         if (!user) {
             return res.json({ success: false, message: "Invalid credentials" });
         }
-        console.log("Login Successfull by : ", role);
-        res.json({ success: true, message: "Login successful", user });
+
+        if (role !== user.role) {
+            return res.json({ success: false, message: "Please Select a valid role" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.json({ success: false, message: "Invalid Password" });
+        }
+
+        req.session.user = {
+            _id: user._id,
+            email: user.email,
+            role: user.role
+        };
+
+        res.json({
+            success: true,
+            message: "Login successful",
+            user
+        });
+
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
 };
 //court  create
+
+
 exports.court = async (req, res) => {
     try {
         const { name, location, description } = req.body;
@@ -67,10 +91,10 @@ exports.getCourts = async (req, res) => {
                         role: "Reader"
                     });
                 const officers = await User.countDocuments
-                ({ 
-                    courtId: court._id,
-                     role: "Officer" 
-                });
+                    ({
+                        courtId: court._id,
+                        role: "Officer"
+                    });
 
                 return {
                     _id: court._id,
@@ -91,16 +115,30 @@ exports.getCourts = async (req, res) => {
 };
 
 
+
+
 exports.addMember = async (req, res) => {
     try {
         const { courtId } = req.params;
         const { email, pass, role } = req.body;
+
         console.log("Add member ", req.body);
 
+        const adminId = req.user._id;
+
+        if (req.user.role !== "Admin") {
+            return res.status(403).json({
+                success: false,
+                message: "Only admin can add members"
+            });
+        }
 
         const court = await Court.findById(courtId);
         if (!court) {
-            return res.status(404).json({ success: false, message: "Court not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Court not found"
+            });
         }
 
         const existingUser = await User.findOne({ email });
@@ -111,14 +149,24 @@ exports.addMember = async (req, res) => {
             });
         }
 
-        const newUser = new User({ email, pass, role, courtId });
-        await newUser.save();
+        const hashedPassword = await bcrypt.hash(pass, 10);
 
+        const newUser = new User({
+            email,
+            password: hashedPassword,
+            role,
+            courtId,
+            createdBy: adminId
+        });
+
+        await newUser.save();
 
         let transporter = nodemailer.createTransport({
             service: "gmail",
-            auth: { user: process.env.EMAIL, pass: process.env.PASS },
-            tls: { rejectUnauthorized: false }
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.PASS
+            }
         });
 
         await transporter.sendMail({
@@ -127,14 +175,23 @@ exports.addMember = async (req, res) => {
             subject: "Your Court Login Credentials",
             text: `You have been added as ${role} in court ${court.name}.
 Email: ${email}
-Password: ${pass}`
+Password: ${pass}
+
+Created by Admin ID: ${adminId}`
         });
 
-        res.status(201).json({ success: true, message: "Member added successfully" });
+        res.status(201).json({
+            success: true,
+            message: "Member added successfully",
+            createdBy: adminId
+        });
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, message: "Server error" });
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
     }
 };
 
@@ -163,14 +220,17 @@ exports.deleteCourt = async (req, res) => {
         await Court.findByIdAndDelete(id);
         await User.deleteMany({ courtId: id });
 
-        res.json({ 
+        res.json({
             success: true,
-             message: "Court and its members delete successfully" });
+            message: "Court and its members delete successfully"
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json(
-            { success: false,
-                 message: "Error deleting court" });
+            {
+                success: false,
+                message: "Error deleting court"
+            });
     }
 }
 exports.getCourtById = async (req, res) => {
@@ -179,8 +239,10 @@ exports.getCourtById = async (req, res) => {
         const court = await Court.findById(id);
         if (!court) {
             return res.status(404).json
-            ({ success: false,
-                 message: "Court not found" });
+                ({
+                    success: false,
+                    message: "Court not found"
+                });
         }
 
         const members = await User.find({ courtId: id }).select("email role -_id");

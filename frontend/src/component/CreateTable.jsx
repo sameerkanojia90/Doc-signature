@@ -21,8 +21,11 @@ function CreateTable({ onUpdateStats }) {
   const [description, setDescription] = useState("");
 
   const fetchCourts = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/court");
+   try {
+      const res = await fetch("http://localhost:5000/court", {
+        credentials: "include",
+      });
+
       const data = await res.json();
       if (data.success) {
         const formatted = data.data.map((court, index) => ({
@@ -50,6 +53,7 @@ function CreateTable({ onUpdateStats }) {
 
     try {
       const res = await fetch(`http://localhost:5000/court/${court.key}`, {
+        credentials:"include",
         method: "DELETE",
       });
 
@@ -111,6 +115,7 @@ function CreateTable({ onUpdateStats }) {
       const res = await fetch("http://localhost:5000/court", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+         credentials: "include",   
         body: JSON.stringify({ name: courtName, location: courtLocation, description }),
       });
       const data = await res.json();
@@ -137,6 +142,7 @@ function CreateTable({ onUpdateStats }) {
       const res = await fetch(`http://localhost:5000/court/${selectedCourt.key}/member`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials:"include",
         body: JSON.stringify({ email, pass, role }),
       });
 
@@ -195,3 +201,4 @@ function CreateTable({ onUpdateStats }) {
 }
 
 export default CreateTable;
+
