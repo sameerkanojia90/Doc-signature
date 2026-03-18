@@ -6,6 +6,13 @@ const { isAuthenticated, authorizeRoles } = require("../middleware/auth");
 
 router.post("/login", authController.login);
 
+router.get("/auth/me", isAuthenticated, (req, res) => {
+  res.json({
+    success: true,
+    user: req.user
+  });
+});
+
 router.post("/court", isAuthenticated, authorizeRoles("Admin"), authController.court);
 router.get("/admin/stats", isAuthenticated, authorizeRoles("Admin"), authController.stateUpdate);
 router.delete("/court/:id", isAuthenticated, authorizeRoles("Admin"), authController.deleteCourt);
