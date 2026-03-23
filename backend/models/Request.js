@@ -1,31 +1,25 @@
+
 const mongoose = require("mongoose");
 
 const DocumentSchema = new mongoose.Schema(
   {
-    docTitle: { type: String, required: true },
-    description: { type: String, required: true },
-
-    templateFile: { type: String, required: true },
-    excelDataFile: { type: String },
-
-    placeholders: {
-      type: [String],
-      default: [],
-    },
-
+    Doctitle: { type: String, required: true },        
+    Description: { type: String, required: true },  
+    templateFile: { type: String, required: true }, 
+    excelDataFile: { type: String },               
+    placeholders: [String],                          
     documents: [
       {
-        filePath: { type: String, required: true },
-
-        date: String,
-        customer: String,
-        amount: Number,
-        dueDate: String,
-        address: String,
-        court: String,
-        caseId: String,
-        referenceNumber: String,
-        signature: String,
+        filePath: String,
+        Date: String,
+        Customer: String,
+        Amount: Number,
+        DueDate: String,
+        Address: String,
+        Court: String,
+        CaseId: String,
+        ReferenceNumber: String,
+        Signature: String,
       },
     ],
   },
