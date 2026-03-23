@@ -46,38 +46,38 @@
       fetchRequests();
     }, []);
 
-    const handleCreate = async (values) => {
-      try {
-        if (!values.file || values.file.length === 0) {
-          message.error("Please select a file to upload");
-          return;
-        }
+   const handleCreate = async (values) => {
+  try {
+    const file = values.file?.[0]?.originFileObj;
 
-        const formData = new FormData();
-        formData.append("title", values.title);
-        formData.append("description", values.description);
-        formData.append("templateFile", values.file[0].originFileObj);
+    if (!file) {
+      return message.error("File not found");
+    }
 
-        const res = await fetch("http://localhost:5000/api/requests", {
-          method: "POST",
-          credentials:"include",
-          body: formData,
-        });
+    const formData = new FormData();
+    formData.append("title", values.title);
+    formData.append("description", values.description);
+    formData.append("templateFile", file);
 
-        const data = await res.json();
+    const res = await fetch("http://localhost:5000/api/requests", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
 
-        if (data.success) {
-          message.success("Request created successfully");
-          fetchRequests();
-          setVisible(false);
-        } else {
-          message.error(data.message || "Failed to create request");
-        }
-      } catch (error) {
-        console.error(error);
-        message.error("Something went wrong");
-      }
-    };
+    const data = await res.json();
+    console.log("UPLOAD RESPONSE:", data);
+
+    if (data.success) {
+      message.success("Created successfully");
+    } else {
+      message.error(data.message);
+    }
+
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const handleDelete = async (id) => {
   try {

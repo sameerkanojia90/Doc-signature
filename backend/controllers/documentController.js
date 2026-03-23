@@ -1,4 +1,5 @@
 const Request = require("../models/Request");
+const Document = require('../models/Document');
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
@@ -30,17 +31,23 @@ exports.uploadFile = (req, res, next) => {
 
 exports.createRequest = async (req, res) => {
   try {
-    const { title, description, createdById, createrRole } = req.body;
+    const { title, description } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json
-      ({ success: false,
-         message: "Template file is required"
-         });
+    const user = req.session.user; 
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    const { value: fileContent } = await mammoth.extractRawText
-    ({ path: req.file.path });
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Template file is required"
+      });
+    }
+
+    const { value: fileContent } = await mammoth.extractRawText({
+      path: req.file.path
+    });
 
     const placeholders = [...fileContent.matchAll(/{(.*?)}/g)].map(
       (match) => `{${match[1].trim()}}`
@@ -49,6 +56,7 @@ exports.createRequest = async (req, res) => {
     const normalizedPlaceholders = placeholders.map((p) =>
       p.replace(/\s+/g, "").toLowerCase()
     );
+
     const requiredFields = ["{caseid}", "{address}", "{signature}", "{delegationmessage}"];
 
     const missing = requiredFields.filter((r) => !normalizedPlaceholders.includes(r));
@@ -68,18 +76,19 @@ exports.createRequest = async (req, res) => {
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.aoa_to_sheet([placeholders]);
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
     const excelFilePath = path.join(folderPath, "data.xlsx");
     XLSX.writeFile(workbook, excelFilePath);
 
-    
     const newRequest = new Request({
       Doctitle: title,
       Description: description,
       templateFile: templateFilePath,
       excelDataFile: excelFilePath,
       placeholders,
-      createdById: createdById || null,
-      createrRole: createrRole || null,
+      createdById: user._id,     // ✅ FIX
+      createrRole: user.role,    // ✅ FIX
+      courtId: user.courtId,     // ✅ VERY IMPORTANT
       datafolderPath: folderPath,
       numberOfDocuments: 0,
       rejectedDocuments: 0,
@@ -87,29 +96,61 @@ exports.createRequest = async (req, res) => {
 
     await newRequest.save();
 
-    res.status(201).json({ success: true, message: "Request created", data: newRequest });
+    res.status(201).json({
+      success: true,
+      message: "Request created",
+      data: newRequest
+    });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
+
 exports.deleteRequest = async (req, res) => {
   try {
     const { id } = req.params;
-    const request = await Request.findById(id);
-    if (!request) return res.status(404).json({ success: false, message: "Request not found" });
 
-    if (fs.existsSync(request.datafolderPath)) {
+    console.log("DELETE ID:", id); 
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "ID missing",
+      });
+    }
+
+    const request = await Request.findById(id);
+
+    if (!request) {
+      return res.status(404).json({
+        success: false,
+        message: "Request not found",
+      });
+    }
+
+    if (request.datafolderPath && fs.existsSync(request.datafolderPath)) {
       fs.rmSync(request.datafolderPath, { recursive: true, force: true });
     }
 
     await Request.findByIdAndDelete(id);
-    res.json({ success: true, message: "Request deleted successfully" });
+
+    res.json({
+      success: true,
+      message: "Request deleted successfully",
+    });
+
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
+
 
 exports.updateRequest = async (req, res) => {
   try {
@@ -134,8 +175,36 @@ exports.updateRequest = async (req, res) => {
 exports.getAllRequests = async (req, res) => {
   try {
     const requests = await Request.find();
-    res.json({ success: true, data: requests });
+
+    const formatted = requests.map((doc) => ({
+      ...doc.toObject(),
+      createdAt: doc.createdAt
+        ? new Date(doc.createdAt).toISOString().split("T")[0]
+        : null,
+    }));
+
+    res.json({ success: true, data: formatted });
+
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+exports.alldocument = async (req, res) => {
+  try {
+    const documents = await Document.find().sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: documents,
+    });
+  } catch (error) {
+    console.error("Fetch Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch documents",
+    });
   }
 };

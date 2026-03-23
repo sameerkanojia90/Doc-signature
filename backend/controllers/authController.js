@@ -269,3 +269,34 @@ exports.getCourtById = async (req, res) => {
         res.status(500).json({ success: false, message: "Server error" });
     }
 };
+
+
+exports.getCourtsWithOfficers = async (req, res) => {
+  try {
+    const courts = await Court.find().lean();
+    const officers = await User.find({ role: "Officer" }).lean();
+    console.log(officers);
+
+    const courtsWithOfficers = courts.map((court) => {
+      const courtOfficers = officers.filter(
+        (o) => o.courtId && o.courtId.toString() === court._id.toString()
+      );
+
+      return {
+        ...court,
+        officers: courtOfficers,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      courts: courtsWithOfficers,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

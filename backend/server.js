@@ -14,7 +14,7 @@ const uploadDir = "./uploads";
 connectdb();
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: ["http://localhost:5173", "http://localhost:3000"],
   credentials: true
 }));
 
@@ -26,8 +26,9 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    maxAge: 600000,
-    sameSite: "lax"
+    maxAge: 87900000,
+    sameSite: "lax",
+    secure: false   
   }
 }));
 
@@ -47,7 +48,7 @@ if (!fs.existsSync(uploadDir)) {
 
 app.use("/", authRoutes);
 app.use("/api/requests", documentRoutes);
-
+app.use("/api/documents", documentRoutes);
 app.listen(port, () => {
-  console.log("Server started at ", port);
+  console.log("Server started at", port);
 });

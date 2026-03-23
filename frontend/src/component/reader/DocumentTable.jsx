@@ -1,5 +1,3 @@
-
-
 import { Table, Dropdown, Menu, Modal } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +12,7 @@ function DocumentTable({ data, onDelete }) {
       okText: "Yes, Delete",
       cancelText: "Cancel",
       okType: "danger",
-      onOk: () => onDelete(record.id),
+      onOk: () => onDelete(record._id), 
     });
   };
 
@@ -34,11 +32,32 @@ function DocumentTable({ data, onDelete }) {
         </span>
       ),
     },
-    { title: "Number of Documents", dataIndex: "numDocs", key: "numDocs" },
-    { title: "Rejected Documents", dataIndex: "rejectedDocs", key: "rejectedDocs" },
-    { title: "Created At", dataIndex: "createdAt", key: "createdAt" },
-    { title: "Last Activity Date", dataIndex: "lastActivity", key: "lastActivity" },
-    { title: "Request Status", dataIndex: "status", key: "status" },
+    {
+      title: "Number of Documents",
+      dataIndex: "numDocs",
+      key: "numDocs",
+    },
+    {
+      title: "Rejected Documents",
+      dataIndex: "rejectedDocs",
+      key: "rejectedDocs",
+    },
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => text || "-", 
+    },
+    {
+      title: "Last Activity Date",
+      dataIndex: "lastActivity",
+      key: "lastActivity",
+    },
+    {
+      title: "Request Status",
+      dataIndex: "status",
+      key: "status",
+    },
     {
       title: "Action",
       key: "action",
@@ -77,8 +96,9 @@ function DocumentTable({ data, onDelete }) {
     <Table
       columns={columns}
       dataSource={data}
+      rowKey="_id"   
       bordered
-      pagination={{ pageSize: 5 }} 
+      pagination={{ pageSize: 5 }}
     />
   );
 }

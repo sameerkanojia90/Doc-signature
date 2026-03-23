@@ -22,18 +22,63 @@ function NewDocDocuments() {
   const [courtList, setCourtList] = useState([]);
   const [officerMap, setOfficerMap] = useState({});
 
-  useEffect(() => {
-    fetch("http://localhost:5000/admin/courts-officers" , {
-      credentials:"include",
-    } )
-      .then((res) => res.json())
-      .then((data) => {
-        setCourtList(data.courts);
-        setOfficerMap(data.officers);
-      })
-      .catch((err) => console.error("Error fetching courts/officers:", err));
-  }, []);
 
+
+
+
+useEffect(() => {
+  fetch("http://localhost:5000/admin/courts-officers", {
+    method: "GET",
+    credentials: "include",
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("API DATA:", data);
+
+      
+      const courts = data.courts.map((c) => c.name);
+
+     
+      const officerMapObj = {};
+
+      data.courts.forEach((court) => {
+  officerMapObj[court.name] = court.officers.map((o) => o.email);
+});
+      setCourtList(courts);
+      setOfficerMap(officerMapObj);
+    })
+    .catch((err) => console.error("Error fetching:", err));
+}, []);
+
+
+const fetchDocuments = async () => {
+  try {
+    const res = await fetch("http://localhost:5000/api/documents/all", {
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.success) {
+      const formattedData = data.data.map((item, index) => ({
+        key: item._id || index,
+        caseId: item.Doctitle || "-",      // map
+        signature: item.Description || "-", 
+        date: item.createdAt?.split("T")[0] || "-",
+        status: "Pending",
+        courtRef: "-", // kyunki backend me nahi hai
+      }));
+
+      setTableData(formattedData);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+useEffect(()=>{
+  fetchDocuments();
+},[]);
   const handleDownloadTemplate = () => {
     const headers = ["Case ID", "Signature", "Date", "Request Status", "Court Reference"];
     const sampleData = [headers];
@@ -43,31 +88,74 @@ function NewDocDocuments() {
     XLSX.writeFile(workbook, "BulkUploadTemplate.xlsx");
   };
 
-  const handleUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+  const convertExcelDate = (excelDate) => {
+  if (typeof excelDate === "number") {
+    const date = new Date((excelDate - 25569) * 86400 * 1000);
+    return date.toISOString().split("T")[0];
+  }
+  return excelDate || "";
+};
+ const handleUpload = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
 
-      const finalData = jsonData.map((item, index) => ({
-        key: Date.now() + index,
-        caseId: item["Case ID"],
-        signature: item["Signature"],
-        date: item["Date"],
-        status: "Pending",
-        courtRef: item["Court Reference"],
-      }));
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-      setTableData(finalData);
-      message.success("File uploaded successfully!");
-    };
-    reader.readAsArrayBuffer(file);
+const finalData = jsonData.map((item, index) => ({
+  key: index,
+  caseId: item["Case ID"],
+  signature: item["Signature"],
+  date: convertExcelDate(item["Date"]), 
+  status: "Pending",
+  courtRef: item["Court Reference"],
+
+  
+}));
+const cleanedData = finalData.filter(
+  (item) =>
+    item.caseId &&
+    item.signature &&
+    item.courtRef &&
+    item.date &&
+    item.date !== '22"0'
+);
+
+    setTableData(cleanedData);
+
+    try {
+  const res = await fetch("http://localhost:5000/api/documents/bulk-upload", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({ documents: cleanedData }),
+  });
+
+  const dataRes = await res.json();
+  console.log(dataRes);
+
+  if (dataRes.success) {
+    message.success("Saved to database!");
+    fetchDocuments();
+  } else {
+    message.error("DB save failed");
+  }
+
+} catch (err) {
+      console.error(err);
+      message.error("Server error");
+    }
   };
+
+  reader.readAsArrayBuffer(file);
+};
 
   const handleSendClick = (record) => {
     setSelectedRecord(record);
@@ -157,12 +245,12 @@ function NewDocDocuments() {
       </div>
 
       <Table
-        dataSource={tableData}
-        columns={columns}
-        locale={{ emptyText: <Empty description="No data" /> }}
-        pagination={false}
-        bordered
-      />
+  dataSource={tableData}
+rowKey={(record) => record._id || record.key}  columns={columns}
+  locale={{ emptyText: <Empty description="No data" /> }}
+  pagination={false}
+  bordered
+/>
 
       <Modal
         title="Send Case to Officer"
