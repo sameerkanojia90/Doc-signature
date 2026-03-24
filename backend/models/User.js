@@ -23,7 +23,11 @@ const UserSchema = new mongoose.Schema({
     courtId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Court"
-    }
+    },
+    court: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Court",
+}
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", UserSchema);

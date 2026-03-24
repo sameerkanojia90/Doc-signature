@@ -1,308 +1,299 @@
-import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Table,
-  Empty,
-  Modal,
-  Form,
-  Select,
-  message,
-  Popconfirm,
-} from "antd";
-import { UploadOutlined, DownloadOutlined, DeleteOutlined } from "@ant-design/icons";
-import * as XLSX from "xlsx";
-import "../../App.css";
+  import React, { useState, useEffect } from "react";
+  import {
+    Button,
+    Table,
+    Empty,
+    Modal,
+    Form,
+    Select,
+    message,
+    Popconfirm,
+  } from "antd";
+  import { UploadOutlined, DownloadOutlined, DeleteOutlined } from "@ant-design/icons";
+  import * as XLSX from "xlsx";
+  import "../../App.css";
 
-function NewDocDocuments() {
-  const [tableData, setTableData] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState(null);
-  const [form] = Form.useForm();
-  const [selectedCourt, setSelectedCourt] = useState(null);
-  const [courtList, setCourtList] = useState([]);
-  const [officerMap, setOfficerMap] = useState({});
-
-
+  function NewDocDocuments() {
+    const [tableData, setTableData] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedRecord, setSelectedRecord] = useState(null);
+    const [form] = Form.useForm();
+    const [selectedCourt, setSelectedCourt] = useState(null);
+    const [courtList, setCourtList] = useState([]);
+    const [officerMap, setOfficerMap] = useState({});
 
 
 
-useEffect(() => {
-  fetch("http://localhost:5000/admin/courts-officers", {
-    method: "GET",
-    credentials: "include",
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("API DATA:", data);
-
-      
-      const courts = data.courts.map((c) => c.name);
-
-     
-      const officerMapObj = {};
-
-      data.courts.forEach((court) => {
-  officerMapObj[court.name] = court.officers.map((o) => o.email);
-});
-      setCourtList(courts);
-      setOfficerMap(officerMapObj);
-    })
-    .catch((err) => console.error("Error fetching:", err));
-}, []);
 
 
-const fetchDocuments = async () => {
-  try {
-    const res = await fetch("http://localhost:5000/api/documents/all", {
-      credentials: "include",
-    });
+    useEffect(() => {
+      fetch("http://localhost:5000/admin/courts-officers", {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("API DATA:", data);
 
-    const data = await res.json();
-    console.log(data);
 
-    if (data.success) {
-      const formattedData = data.data.map((item, index) => ({
-        key: item._id || index,
-        caseId: item.Doctitle || "-",      // map
-        signature: item.Description || "-", 
-        date: item.createdAt?.split("T")[0] || "-",
-        status: "Pending",
-        courtRef: "-", // kyunki backend me nahi hai
-      }));
+          const courts = data.courts.map((c) => c.name);
 
-      setTableData(formattedData);
+
+          const officerMapObj = {};
+
+          data.courts.forEach((court) => {
+            officerMapObj[court.name] = court.officers.map((o) => o.email);
+          });
+          setCourtList(courts);
+          setOfficerMap(officerMapObj);
+        })
+        .catch((err) => console.error("Error fetching:", err));
+    }, []);
+
+
+    const fetchDocuments = async () => {
+      try {
+        const requestId = localStorage.getItem("requestId");
+        console.log(requestId);
+
+        if (!requestId || requestId === "null") {
+          message.error("Request ID missing");
+          return;
+        }
+        const res = await fetch(`http://localhost:5000/api/documents/generated/${requestId}`);;
+
+        const data = await res.json();
+        console.log(data);
+
+        if (data.success) {
+          const formattedData = data.data.map((item, index) => ({
+            key: item._id,
+            _id: item._id,
+            caseId: item.caseId || "-",
+            signature: item.signature || "-",
+            date: item.date || "-",
+            status: item.status || "Pending",
+            courtRef: item.courtRef || "-",
+          }));
+
+          setTableData(formattedData);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    useEffect(() => {
+      const requestId = localStorage.getItem("requestId");
+      if (requestId) {
+        fetchDocuments();
+      }
+    }, []);
+    const handleDownloadTemplate = () => {
+      const headers = ["Case ID", "Signature", "Date", "Request Status", "Court Reference"];
+      const sampleData = [headers];
+      const worksheet = XLSX.utils.aoa_to_sheet(sampleData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
+      XLSX.writeFile(workbook, "BulkUploadTemplate.xlsx");
+    };
+
+
+    const convertExcelDate = (excelDate) => {
+      if (typeof excelDate === "number") {
+        const date = new Date((excelDate - 25569) * 86400 * 1000);
+        return date.toISOString().split("T")[0];
+      }
+      return excelDate || "";
+    };
+  const handleUpload = async (event) => {
+    const requestId = localStorage.getItem("requestId");
+
+    const file = event.target.files[0];
+
+    if (!file) {
+      console.log("No file selected");
+      return;
     }
-  } catch (error) {
-    console.error(error);
-  }
-};
-useEffect(()=>{
-  fetchDocuments();
-},[]);
-  const handleDownloadTemplate = () => {
-    const headers = ["Case ID", "Signature", "Date", "Request Status", "Court Reference"];
-    const sampleData = [headers];
-    const worksheet = XLSX.utils.aoa_to_sheet(sampleData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
-    XLSX.writeFile(workbook, "BulkUploadTemplate.xlsx");
-  };
 
+    console.log(" FILE SELECTED:", file);
 
-  const convertExcelDate = (excelDate) => {
-  if (typeof excelDate === "number") {
-    const date = new Date((excelDate - 25569) * 86400 * 1000);
-    return date.toISOString().split("T")[0];
-  }
-  return excelDate || "";
-};
- const handleUpload = (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: "array" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-
-const finalData = jsonData.map((item, index) => ({
-  key: index,
-  caseId: item["Case ID"],
-  signature: item["Signature"],
-  date: convertExcelDate(item["Date"]), 
-  status: "Pending",
-  courtRef: item["Court Reference"],
-
-  
-}));
-const cleanedData = finalData.filter(
-  (item) =>
-    item.caseId &&
-    item.signature &&
-    item.courtRef &&
-    item.date &&
-    item.date !== '22"0'
-);
-
-    setTableData(cleanedData);
+    const formData = new FormData();
+    formData.append("file", file);
 
     try {
-  const res = await fetch("http://localhost:5000/api/documents/bulk-upload", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({ documents: cleanedData }),
-  });
+      const res = await fetch(
+        `http://localhost:5000/api/documents/bulk-upload/${requestId}`,
+        {
+          method: "POST",
+          body: formData, 
+        }
+      );
 
-  const dataRes = await res.json();
-  console.log(dataRes);
+      console.log("RESPONSE STATUS:", res.status);
 
-  if (dataRes.success) {
-    message.success("Saved to database!");
-    fetchDocuments();
-  } else {
-    message.error("DB save failed");
-  }
+      const data = await res.json();
+      console.log("RESPONSE DATA:", data);
 
-} catch (err) {
-      console.error(err);
-      message.error("Server error");
+    } catch (err) {
+      console.error("UPLOAD ERROR:", err);
     }
   };
+    const handleSendClick = (record) => {
+      setSelectedRecord(record);
+      setSelectedCourt(null);
+      setIsModalOpen(true);
+    };
 
-  reader.readAsArrayBuffer(file);
-};
+    const handleFormSubmit = async (values) => {
+      try {
+        await fetch(
+          `http://localhost:5000/api/documents/send/${selectedRecord._id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              officerEmail: values.officer,
+              courtName: values.court,
+            }),
+          }
+        );
 
-  const handleSendClick = (record) => {
-    setSelectedRecord(record);
-    setSelectedCourt(null);
-    setIsModalOpen(true);
-  };
+        message.success("Sent successfully!");
+        fetchDocuments();
+        setIsModalOpen(false);
 
-  const handleFormSubmit = (values) => {
-    const updatedData = tableData.map((item) =>
-      item.key === selectedRecord.key
-        ? { ...item, status: `Sent to ${values.officer} (${values.court})` }
-        : item
-    );
-    setTableData(updatedData);
-    message.success(`Case ${selectedRecord.caseId} sent to Officer: ${values.officer}`);
-    setIsModalOpen(false);
-    form.resetFields();
-  };
+      } catch (err) {
+        message.error("Error sending");
+      }
+    };
+    const handleDelete = (recordKey) => {
+      setTableData(tableData.filter((item) => item.key !== recordKey));
+    };
 
-  const handleDelete = (recordKey) => {
-    setTableData(tableData.filter((item) => item.key !== recordKey));
-  };
-
-  const columns = [
-    { title: "Case ID", dataIndex: "caseId", key: "caseId" },
-    { title: "Signature", dataIndex: "signature", key: "signature" },
-    { title: "Date", dataIndex: "date", key: "date" },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (text) => (
-        <span className={text.startsWith("Sent") ? "status-sent" : "status-pending"}>
-          {text}
-        </span>
-      ),
-    },
-    { title: "Court Reference", dataIndex: "courtRef", key: "courtRef" },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <div className="action-buttons">
-          <Button
-            type="primary"
-            disabled={record.status.startsWith("Sent")}
-            onClick={() => handleSendClick(record)}
-          >
-            Send
-          </Button>
-          <Popconfirm
-            title="Are you sure to delete this record?"
-            onConfirm={() => handleDelete(record.key)}
-          >
-            <Button danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </div>
-      ),
-    },
-  ];
-
-  return (
-    <div className="doc-container">
-      <div className="doc-header">
-        <h2>Documents INFO</h2>
-        <div className="doc-buttons">
-          <label htmlFor="fileUpload">
+    const columns = [
+      { title: "Case ID", dataIndex: "caseId", key: "caseId" },
+      { title: "Signature", dataIndex: "signature", key: "signature" },
+      { title: "Date", dataIndex: "date", key: "date" },
+      {
+        title: "Status",
+        dataIndex: "status",
+        key: "status",
+        render: (text) => (
+          <span className={text.startsWith("Sent") ? "status-sent" : "status-pending"}>
+            {text}
+          </span>
+        ),
+      },
+      { title: "Court Reference", dataIndex: "courtRef", key: "courtRef" },
+      {
+        title: "Action",
+        key: "action",
+        render: (_, record) => (
+          <div className="action-buttons">
             <Button
               type="primary"
-              icon={<UploadOutlined />}
-              onClick={() => document.getElementById("fileUpload").click()}
+              disabled={record.status.startsWith("Sent")}
+              onClick={() => handleSendClick(record)}
             >
-              Upload
-            </Button>
-          </label>
-          <input
-            type="file"
-            id="fileUpload"
-            accept=".xlsx, .xls"
-            style={{ display: "none" }}
-            onChange={handleUpload}
-          />
-          <Button icon={<DownloadOutlined />} onClick={handleDownloadTemplate}>
-            Download Bulk Upload Format
-          </Button>
-        </div>
-      </div>
-
-      <Table
-  dataSource={tableData}
-rowKey={(record) => record._id || record.key}  columns={columns}
-  locale={{ emptyText: <Empty description="No data" /> }}
-  pagination={false}
-  bordered
-/>
-
-      <Modal
-        title="Send Case to Officer"
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        footer={null}
-      >
-        <Form form={form} onFinish={handleFormSubmit} layout="vertical">
-          <Form.Item
-            name="court"
-            label="Select Court"
-            rules={[{ required: true, message: "Please select a court" }]}
-          >
-            <Select
-              placeholder="Choose a court"
-              onChange={(value) => {
-                setSelectedCourt(value);
-                form.setFieldsValue({ officer: undefined });
-              }}
-            >
-              {courtList.map((court) => (
-                <Select.Option key={court} value={court}>
-                  {court}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            name="officer"
-            label="Select Officer"
-            rules={[{ required: true, message: "Please select an officer" }]}
-          >
-            <Select placeholder="Choose an officer" disabled={!selectedCourt}>
-              {selectedCourt &&
-                officerMap[selectedCourt]?.map((officer) => (
-                  <Select.Option key={officer} value={officer}>
-                    {officer}
-                  </Select.Option>
-                ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block>
               Send
             </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
-  );
-}
+            <Popconfirm
+              title="Are you sure to delete this record?"
+              onConfirm={() => handleDelete(record.key)}
+            >
+              <Button danger icon={<DeleteOutlined />} />
+            </Popconfirm>
+          </div>
+        ),
+      },
+    ];
 
-export default NewDocDocuments;
+    return (
+      <div className="doc-container">
+        <div className="doc-header">
+          <h2>Documents INFO</h2>
+          <div className="doc-buttons">
+            <label htmlFor="fileUpload">
+              <Button
+                type="primary"
+                icon={<UploadOutlined />}
+                onClick={() => document.getElementById("fileUpload").click()}
+              >
+                Upload
+              </Button>
+            </label>
+            <input
+              type="file"
+              id="fileUpload"
+              accept=".xlsx, .xls"
+              style={{ display: "none" }}
+              onChange={handleUpload}
+            />
+            <Button icon={<DownloadOutlined />} onClick={handleDownloadTemplate}>
+              Download Bulk Upload Format
+            </Button>
+          </div>
+        </div>
+
+        <Table
+          dataSource={tableData}
+          rowKey={(record) => record._id || record.key} columns={columns}
+          locale={{ emptyText: <Empty description="No data" /> }}
+          pagination={false}
+          bordered
+        />
+
+        <Modal
+          title="Send Case to Officer"
+          open={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
+          footer={null}
+        >
+          <Form form={form} onFinish={handleFormSubmit} layout="vertical">
+            <Form.Item
+              name="court"
+              label="Select Court"
+              rules={[{ required: true, message: "Please select a court" }]}
+            >
+              <Select
+                placeholder="Choose a court"
+                onChange={(value) => {
+                  setSelectedCourt(value);
+                  form.setFieldsValue({ officer: undefined });
+                }}
+              >
+                {courtList.map((court) => (
+                  <Select.Option key={court} value={court}>
+                    {court}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="officer"
+              label="Select Officer"
+              rules={[{ required: true, message: "Please select an officer" }]}
+            >
+              <Select placeholder="Choose an officer" disabled={!selectedCourt}>
+                {selectedCourt &&
+                  officerMap[selectedCourt]?.map((officer) => (
+                    <Select.Option key={officer} value={officer}>
+                      {officer}
+                    </Select.Option>
+                  ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit" block>
+                Send
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
+      </div>
+    );
+  }
+
+  export default NewDocDocuments;

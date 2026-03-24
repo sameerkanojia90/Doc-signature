@@ -27,7 +27,8 @@ exports.login = async (req, res) => {
         req.session.user = {
             _id: user._id,
             email: user.email,
-            role: user.role
+            role: user.role,
+            courtId: user.courtId 
         };
 
         res.json({

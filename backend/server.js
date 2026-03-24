@@ -39,7 +39,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/uploads", express.static("uploads"));
+// app.use("/uploads", express.static("uploads"));
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
@@ -49,6 +49,7 @@ if (!fs.existsSync(uploadDir)) {
 app.use("/", authRoutes);
 app.use("/api/requests", documentRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/uploads", express.static("uploads"));
 app.listen(port, () => {
   console.log("Server started at", port);
 });

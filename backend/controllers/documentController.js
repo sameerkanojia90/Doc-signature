@@ -32,6 +32,7 @@ exports.uploadFile = (req, res, next) => {
 exports.createRequest = async (req, res) => {
   try {
     const { title, description } = req.body;
+    console.log(req.body);
 
     const user = req.session.user; 
     if (!user) {
@@ -86,9 +87,10 @@ exports.createRequest = async (req, res) => {
       templateFile: templateFilePath,
       excelDataFile: excelFilePath,
       placeholders,
-      createdById: user._id,     // ✅ FIX
-      createrRole: user.role,    // ✅ FIX
-      courtId: user.courtId,     // ✅ VERY IMPORTANT
+      createdById: user._id,     
+      createrRole: user.role,    
+      courtId: user.courtId,   
+       officer: req.body.officerId,  
       datafolderPath: folderPath,
       numberOfDocuments: 0,
       rejectedDocuments: 0,
@@ -109,47 +111,6 @@ exports.createRequest = async (req, res) => {
 };
 
 
-exports.deleteRequest = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    console.log("DELETE ID:", id); 
-
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        message: "ID missing",
-      });
-    }
-
-    const request = await Request.findById(id);
-
-    if (!request) {
-      return res.status(404).json({
-        success: false,
-        message: "Request not found",
-      });
-    }
-
-    if (request.datafolderPath && fs.existsSync(request.datafolderPath)) {
-      fs.rmSync(request.datafolderPath, { recursive: true, force: true });
-    }
-
-    await Request.findByIdAndDelete(id);
-
-    res.json({
-      success: true,
-      message: "Request deleted successfully",
-    });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
 
 
 exports.updateRequest = async (req, res) => {
@@ -191,9 +152,121 @@ exports.getAllRequests = async (req, res) => {
 };
 
 
+exports.getOfficerRequests = async (req, res) => {
+  try {
+    console.log("LOGGED USER:", req.user);
+
+    const requests = await Document.find();
+
+    console.log("ALL DOCS:", requests);
+
+    res.status(200).json({
+      success: true,
+      data: requests,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false });
+  }
+};
+
+
+// exports.signDocument = async (req, res) => {
+//   try {
+//     const doc = await Request.findById(req.params.id);
+
+//     if (!doc) {
+//       return res.status(404).json({ success: false });
+//     }
+
+//     if (!req.file) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "File required",
+//       });
+//     }
+
+//     doc.status = "Resolved";
+//     doc.signature = req.file.filename;
+
+//     await doc.save();
+
+//     res.json({ success: true, data: doc });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ success: false });
+//   }
+// };
+
+
+
+const GeneratedDocument = require("../models/GeneratedDocument");
+
+exports.signDocument = async (req, res) => {
+  try {
+    const request = await Request.findById(req.params.id);
+
+    if (!request) {
+      return res.status(404).json({ success: false });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "File required",
+      });
+    }
+
+    // ✅ SAVE IN NEW MODEL
+    const newDoc = new GeneratedDocument({
+      requestId: request._id,
+      signature: req.file.filename,
+      date: new Date().toISOString().split("T")[0],
+      status: "Resolved",
+    });
+
+    await newDoc.save();
+
+    res.json({ success: true, data: newDoc });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false });
+  }
+};
+
+exports.rejectDocument = async (req, res) => {
+  try {
+    const doc = await Request.findById(req.params.id);
+
+    if (!doc) return res.status(404).json({ success: false });
+
+    doc.status = "Rejected";
+    await doc.save();
+
+    await GeneratedDocument.updateMany(
+      { requestId: doc._id.toString() },
+      { status: "Rejected" }
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+};
+exports.deleteRequest = async (req, res) => {
+  try {
+    await Document.findByIdAndDelete(req.params.id);
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+};
 exports.alldocument = async (req, res) => {
   try {
     const documents = await Document.find().sort({ createdAt: -1 });
+    console.log(documents);
 
     res.status(200).json({
       success: true,

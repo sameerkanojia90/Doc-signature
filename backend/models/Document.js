@@ -7,7 +7,7 @@ const documentSchema = new mongoose.Schema(
       required: true,
     },
     signature: {
-      type: Number,
+      type: String,
       required: true,
     },
     date: {
@@ -22,6 +22,10 @@ const documentSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    requestId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Request"
+}
 
   
   

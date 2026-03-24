@@ -7,7 +7,8 @@ const DocumentSchema = new mongoose.Schema(
     Description: { type: String, required: true },  
     templateFile: { type: String, required: true }, 
     excelDataFile: { type: String },               
-    placeholders: [String],                          
+    placeholders: [String],  
+                            
     documents: [
       {
         filePath: String,
@@ -22,7 +23,12 @@ const DocumentSchema = new mongoose.Schema(
         Signature: String,
       },
     ],
+    court: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Court",
+},
   },
+  
   { timestamps: true }
 );
 

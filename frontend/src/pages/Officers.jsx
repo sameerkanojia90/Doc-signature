@@ -8,18 +8,22 @@ function OfficerDocuments() {
 
   const fetchDocs = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/requests", {
-        credentials: "include",
-      });
+      const res = await fetch(
+        "http://localhost:5000/api/requests/officer-requests",
+        { credentials: "include" }
+      );
 
       const result = await res.json();
 
       if (result.success) {
-        const formatted = result.data.map((doc) => ({
-          _id: doc._id,
-          title: doc.Doctitle || "No Title",
-          status: doc.status || "Pending",
-        }));
+        const formatted = result.data
+          .filter((doc) => doc.status !== "Rejected")
+          .map((doc) => ({
+            _id: doc._id,
+            title: doc.Doctitle || "No Title",
+            status: doc.status || "Pending",
+            signedFile: doc.signature,
+          }));
 
         setData(formatted);
       }
@@ -32,66 +36,97 @@ function OfficerDocuments() {
     fetchDocs();
   }, []);
 
-  // ✅ SIGN
   const handleSign = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("signedFile", selectedDoc.file);
+    if (!selectedDoc?.file) {
+      return message.error("Select file");
+    }
 
+    const formData = new FormData();
+    formData.append("signedFile", selectedDoc.file);
+
+    const res = await fetch(
+      `http://localhost:5000/api/requests/${selectedDoc._id}/sign`,
+      {
+        method: "PUT",
+        body: formData,
+        credentials: "include",
+      }
+    );
+
+    const dataRes = await res.json();
+
+    if (dataRes.success) {
+      message.success("Resolved");
+
+      setData((prev) =>
+        prev.map((item) =>
+          item._id === selectedDoc._id
+            ? {
+                ...item,
+                status: "Resolved",
+                signedFile: dataRes.data.signedFile,
+              }
+            : item
+        )
+      );
+
+      setSelectedDoc((prev) => ({
+        ...prev,
+        status: "Resolved",
+        signedFile: dataRes.data.signedFile,
+      }));
+
+      setOpen(false);
+    } else {
+      message.error(dataRes.message || "Upload failed");
+    }
+  };
+
+  const handleReject = async (id) => {
+    try {
       const res = await fetch(
-        `http://localhost:5000/api/requests/${selectedDoc._id}/sign`,
+        `http://localhost:5000/api/requests/${id}/reject`,
         {
           method: "PUT",
-          body: formData,
           credentials: "include",
         }
       );
 
-      const data = await res.json();
+      const dataRes = await res.json();
 
-      if (data.success) {
-        message.success("Signed ✅");
-        setOpen(false);
-        fetchDocs();
+      if (dataRes.success) {
+        message.warning("Rejected");
+        setData((prev) => prev.filter((item) => item._id !== id));
+      } else {
+        message.error(dataRes.message || "Reject failed");
       }
     } catch (err) {
       console.error(err);
+      message.error("Server error");
     }
   };
 
-  // ❌ REJECT
-  const handleReject = async (id) => {
-    const res = await fetch(
-      `http://localhost:5000/api/requests/${id}/reject`,
-      {
-        method: "PUT",
-        credentials: "include",
-      }
-    );
-
-    const data = await res.json();
-
-    if (data.success) {
-      message.warning("Rejected ❌");
-      fetchDocs();
-    }
-  };
-
-  // 🗑 DELETE
   const handleDelete = async (id) => {
-    const res = await fetch(
-      `http://localhost:5000/api/requests/${id}`,
-      {
-        method: "DELETE",
-        credentials: "include",
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/requests/${id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      const dataRes = await res.json();
+
+      if (dataRes.success) {
+        message.success("Deleted");
+        setData((prev) => prev.filter((item) => item._id !== id));
+      } else {
+        message.error("Delete failed");
       }
-    );
-
-    const data = await res.json();
-
-    if (data.success) {
-      message.success("Deleted 🗑");
-      fetchDocs();
+    } catch (err) {
+      console.error(err);
+      message.error("Server error");
     }
   };
 
@@ -107,7 +142,7 @@ function OfficerDocuments() {
         <span
           style={{
             color:
-              text === "Signed"
+              text === "Resolved"
                 ? "green"
                 : text === "Rejected"
                 ? "red"
@@ -150,36 +185,53 @@ function OfficerDocuments() {
     },
   ];
 
-  return (
-    <div>
-      <h2>Officer Panel</h2>
+ return (
+  <div>
+    <h2>Officer Panel</h2>
 
-      <Table columns={columns} dataSource={data} rowKey="_id" />
+    <Table columns={columns} dataSource={data} rowKey="_id" />
 
-      <Modal open={open} onCancel={() => setOpen(false)} footer={null}>
-        {selectedDoc && (
-          <div>
-            <p><strong>Title:</strong> {selectedDoc.title}</p>
-            <p><strong>Status:</strong> {selectedDoc.status}</p>
+    <Modal open={open} onCancel={() => setOpen(false)} footer={null}>
+      {selectedDoc && (
+        <div>
+          <p><strong>Title:</strong> {selectedDoc.title}</p>
+          <p><strong>Status:</strong> {selectedDoc.status}</p>
 
-            <input
-              type="file"
-              onChange={(e) =>
-                setSelectedDoc({
-                  ...selectedDoc,
-                  file: e.target.files[0],
-                })
-              }
-            />
+          {selectedDoc?.signedFile ? (
+            <div style={{ marginBottom: "10px" }}>
+              <p><strong>Signature:</strong></p>
+              <img
+                src={`http://localhost:5000/uploads/${selectedDoc.signedFile}`}
+                width="150"
+                style={{ border: "1px solid #000000", padding: "5px" }}
+                alt="signature"
+              />
+            </div>
+          ) : (
+            <p></p>
+          )}
 
-            <Button type="primary" onClick={handleSign}>
-              Sign & Upload
-            </Button>
-          </div>
-        )}
-      </Modal>
-    </div>
-  );
+          {/* File Upload */}
+          <input
+            type="file"
+            onChange={(e) =>
+              setSelectedDoc({
+                ...selectedDoc,
+                file: e.target.files[0],
+              })
+            }
+          />
+
+          <br /><br />
+
+          <Button type="primary" onClick={handleSign}>
+            Sign & Upload
+          </Button>
+        </div>
+      )}
+    </Modal>
+  </div>
+);
 }
 
 export default OfficerDocuments;

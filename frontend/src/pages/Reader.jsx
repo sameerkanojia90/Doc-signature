@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button, message, Upload } from "antd";
-import CreateRequestModal from "../component/reader/CreateRequestModel";
+import CreateRequestModel from "../component/reader/CreateRequestModel";
 import DocumentTable from "../component/reader/DocumentTable";
 import "../App.css";
 
 function Reader() {
   const [visible, setVisible] = useState(false);
   const [documents, setDocuments] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchRequests = async () => {
     try {
@@ -40,46 +41,38 @@ function Reader() {
     fetchRequests();
   }, []);
 
-const handleCreate = async (values) => {
+
+ const handleCreate = async (values) => {
   try {
-    if (!values.file || values.file.length === 0) {
-      return message.error("Please select a template file (.docx)");
-    }
-
-    const file = values.file[0].originFileObj;
-
-    if (!file) {
-      return message.error("File not found");
-    }
-
     const formData = new FormData();
     formData.append("title", values.title);
     formData.append("description", values.description);
-    formData.append("templateFile", file);
+    formData.append("templateFile", values.file[0].originFileObj);
 
-    const res = await fetch("http://localhost:5000/api/requests", {
+    const res = await fetch("http://localhost:5000/api/documents", {
       method: "POST",
-      credentials: "include",
       body: formData,
+      credentials: "include",
     });
 
+    console.log("API STATUS:", res.status); 
     const data = await res.json();
-    console.log("UPLOAD RESPONSE:", data);
+    console.log("API RESPONSE:", data);
+    console.log("requestId", data.data._id);
 
     if (data.success) {
-      message.success("Request created successfully");
-      fetchRequests();
-      setVisible(false);
+      localStorage.setItem("requestId", data.data._id);
+      console.log("SAVED ID:", data.data._id); 
+      setIsModalOpen(false);
     } else {
-      message.error(data.message || "Upload failed");
+      alert(data.message);
     }
   } catch (err) {
     console.error(err);
-    message.error("Something went wrong");
   }
 };
 
-  return (
+return (
     <div className="reader-container">
       <Button type="primary" onClick={() => setVisible(true)}>
         Create New Request
@@ -87,9 +80,9 @@ const handleCreate = async (values) => {
 
       <DocumentTable data={documents} />
 
-      <CreateRequestModal
-        visible={visible}
-        onCancel={() => setVisible(false)}
+      <CreateRequestModel
+        visible={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
         onCreate={handleCreate}
       />
     </div>
