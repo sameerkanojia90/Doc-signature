@@ -166,9 +166,35 @@
         message.error("Error sending");
       }
     };
-    const handleDelete = (recordKey) => {
-      setTableData(tableData.filter((item) => item.key !== recordKey));
-    };
+
+const handleDelete = async (recordKey) => {
+  try {
+    const res = await fetch(
+      `http://localhost:5000/api/documents/${recordKey}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      message.success("Deleted successfully");
+
+      setTableData((prev) =>
+        prev.filter((item) => item._id !== recordKey)
+      );
+    } else {
+      message.error("Delete failed");
+    }
+  } catch (err) {
+    console.error(err);
+    message.error("Error deleting");
+  }
+};
+
+
 
     const columns = [
       { title: "Case ID", dataIndex: "caseId", key: "caseId" },
@@ -199,7 +225,7 @@
             </Button>
             <Popconfirm
               title="Are you sure to delete this record?"
-              onConfirm={() => handleDelete(record.key)}
+              onConfirm={() => handleDelete(record._id)}
             >
               <Button danger icon={<DeleteOutlined />} />
             </Popconfirm>

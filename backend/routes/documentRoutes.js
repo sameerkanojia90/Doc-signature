@@ -10,6 +10,8 @@ const {
   alldocument,
   signDocument,
   rejectDocument,
+  deleteDocument
+
 } = require("../controllers/documentController");
 
 const GeneratedDocument = require("../models/GeneratedDocument");
@@ -36,7 +38,6 @@ router.get("/all", isAuthenticated, alldocument);
 
 router.put("/:id/sign", isAuthenticated, upload.single("signedFile"), signDocument);
 router.put("/:id/reject", isAuthenticated, rejectDocument);
-router.delete("/:id", isAuthenticated, deleteRequest);
 router.get("/officer-requests", isAuthenticated, getOfficerRequests);
 
 router.post("/bulk-upload/:requestId", uploadExcel, async (req, res) => {
@@ -136,5 +137,6 @@ router.get("/officer-docs", isAuthenticated, async (req, res) => {
     });
   }
 });
+router.delete("/:id", isAuthenticated, deleteDocument);
 
 module.exports = router;

@@ -255,3 +255,36 @@ exports.alldocument = async (req, res) => {
     });
   }
 };
+
+const mongoose = require("mongoose");
+
+exports.deleteDocument = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log("DELETE ID:", id);
+
+    const deletedDoc = await GeneratedDocument.findByIdAndDelete(id);
+
+    console.log("DELETED DOC:", deletedDoc);
+
+    if (!deletedDoc) {
+      return res.status(404).json({
+        success: false,
+        message: "Document not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Deleted successfully",
+    });
+
+  } catch (err) {
+    console.error("ERROR:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
