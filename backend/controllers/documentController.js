@@ -228,6 +228,7 @@ exports.rejectDocument = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
+
 exports.deleteRequest = async (req, res) => {
   try {
     await Document.findByIdAndDelete(req.params.id);
@@ -237,6 +238,7 @@ exports.deleteRequest = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
+
 exports.alldocument = async (req, res) => {
   try {
     const documents = await Document.find().sort({ createdAt: -1 });

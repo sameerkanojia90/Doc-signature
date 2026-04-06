@@ -20,12 +20,34 @@ function InfoCard({ title, value }) {
 }
 
 function Admin() {
+  const [docCount, setDocCount] = useState(0);
   const [stats, setStats] = useState({
     courts: 0,
     readers: 0,
     officers: 0,
     signedDocs: 0,
   });
+
+const fetchDocument = async () => {
+  try {
+    const res = await fetch("http://localhost:5000/api/documents/all", {
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    const count = data.data.length;
+
+    console.log("Total Documents:", count);
+
+    setDocCount(count);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+useEffect(()=>{
+  fetchDocument();
+},[]);
 
   const fetchStats = async () => {
     try {
@@ -48,7 +70,7 @@ function Admin() {
     { title: "Courts", value: stats.courts || 0 },
     { title: "Reader", value: stats.readers || 0 },
     { title: "Officers", value: stats.officers || 0 },
-    { title: "Document Signed", value: stats.signedDocs || 0 },
+    { title: "Document Signed", value: docCount || 0 },
   ];
 
   return (
