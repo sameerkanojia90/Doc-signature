@@ -1,3 +1,4 @@
+
 const Request = require("../models/Request");
 const Document = require('../models/Document');
 const multer = require("multer");
@@ -170,33 +171,6 @@ exports.getOfficerRequests = async (req, res) => {
   }
 };
 
-
-// exports.signDocument = async (req, res) => {
-//   try {
-//     const doc = await Request.findById(req.params.id);
-
-//     if (!doc) {
-//       return res.status(404).json({ success: false });
-//     }
-
-//     if (!req.file) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "File required",
-//       });
-//     }
-
-//     doc.status = "Resolved";
-//     doc.signature = req.file.filename;
-
-//     await doc.save();
-
-//     res.json({ success: true, data: doc });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ success: false });
-//   }
-// };
 
 
 

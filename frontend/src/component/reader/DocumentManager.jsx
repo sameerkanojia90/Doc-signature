@@ -1,6 +1,6 @@
   import { useState, useEffect } from "react";
   import { Button, message } from "antd";
-  import CreateRequestModal from "./CreateRequestModal";
+  import CreateRequestModel from "./CreateRequestModel";
   import DocumentTable from "./DocumentTable";
   import "../../App.css";
 
@@ -46,7 +46,7 @@
       fetchRequests();
     }, []);
 
-   const handleCreate = async (values) => {
+const handleCreate = async (values) => {
   try {
     const file = values.file?.[0]?.originFileObj;
 
@@ -70,6 +70,8 @@
 
     if (data.success) {
       message.success("Created successfully");
+      setVisible(false);   // 🔥 modal band
+      fetchRequests();     // 🔥 data reload
     } else {
       message.error(data.message);
     }
@@ -119,7 +121,7 @@
 
           <DocumentTable data={documents} onDelete={handleDelete} />
 
-          <CreateRequestModal
+          <CreateRequestModel
             visible={visible}
             onCancel={() => setVisible(false)}
             onCreate={handleCreate}

@@ -1,5 +1,4 @@
 
-
 const mongoose = require("mongoose");
 
 const GeneratedDocumentSchema = new mongoose.Schema({
@@ -7,9 +6,11 @@ const GeneratedDocumentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Request",
   },
+  caseId:{
+    type: String,
+  },
   signature: {
     type: String,
-    required: true,
   },
   date: String,
   status: {

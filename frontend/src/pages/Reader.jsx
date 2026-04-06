@@ -1,20 +1,20 @@
 import { useState, useEffect } from "react";
-import { Button, message, Upload } from "antd";
+import { Button, message } from "antd";
 import CreateRequestModel from "../component/reader/CreateRequestModel";
 import DocumentTable from "../component/reader/DocumentTable";
 import "../App.css";
 
 function Reader() {
-  const [visible, setVisible] = useState(false);
   const [documents, setDocuments] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/requests" , {
-        credentials:"include",
-      }   );
+      const res = await fetch("http://localhost:5000/api/requests", {
+        credentials: "include",
+      });
       const data = await res.json();
+
       if (data.success) {
         setDocuments(
           data.data.map((doc) => ({
@@ -41,40 +41,36 @@ function Reader() {
     fetchRequests();
   }, []);
 
+  const handleCreate = async (values) => {
+    try {
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("description", values.description);
+      formData.append("templateFile", values.file[0].originFileObj);
 
- const handleCreate = async (values) => {
-  try {
-    const formData = new FormData();
-    formData.append("title", values.title);
-    formData.append("description", values.description);
-    formData.append("templateFile", values.file[0].originFileObj);
+      const res = await fetch("http://localhost:5000/api/documents", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
 
-    const res = await fetch("http://localhost:5000/api/documents", {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-    });
+      const data = await res.json();
 
-    console.log("API STATUS:", res.status); 
-    const data = await res.json();
-    console.log("API RESPONSE:", data);
-    console.log("requestId", data.data._id);
-
-    if (data.success) {
-      localStorage.setItem("requestId", data.data._id);
-      console.log("SAVED ID:", data.data._id); 
-      setIsModalOpen(false);
-    } else {
-      alert(data.message);
+      if (data.success) {
+        localStorage.setItem("requestId", data.data._id);
+        setIsModalOpen(false);
+        fetchRequests();
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      console.error(err);
     }
-  } catch (err) {
-    console.error(err);
-  }
-};
+  };
 
-return (
+  return (
     <div className="reader-container">
-      <Button type="primary" onClick={() => setVisible(true)}>
+      <Button type="primary" onClick={() => setIsModalOpen(true)}>
         Create New Request
       </Button>
 

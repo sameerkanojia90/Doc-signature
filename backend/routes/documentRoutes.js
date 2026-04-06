@@ -64,7 +64,7 @@ router.post("/bulk-upload/:requestId", uploadExcel, async (req, res) => {
     const docs = data.map((item) => ({
       requestId: requestId.toString(),
       caseId: item["Case ID"],
-      signature: item["Signature"],
+      signature: null,
       date: item["Date"],
       courtRef: item["Court Reference"],
       status: "Pending",

@@ -26,7 +26,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    maxAge: 87900000,
+    maxAge:3600000,
     sameSite: "lax",
     secure: false   
   }
@@ -39,7 +39,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.use("/uploads", express.static("uploads"));
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
