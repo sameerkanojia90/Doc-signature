@@ -8,7 +8,7 @@ const seedAdmin = async () => {
         const admin = await User.findOne({ role: "Admin" });
 
         if (!admin) {
-            const hashedPassword = await bcrypt.hash("123456", 10);
+            const hashedPassword = await bcrypt.hash("9090", 10);
 
             await User.create({
                 email: adminEmail,

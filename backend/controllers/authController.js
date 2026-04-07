@@ -165,8 +165,8 @@ exports.addMember = async (req, res) => {
         let transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: process.env.EMAIL,
-                pass: process.env.PASS
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
             }
         });
 
@@ -174,7 +174,9 @@ exports.addMember = async (req, res) => {
             from: '"Court Admin" <admin7612@gmail.com>',
             to: email.trim(),
             subject: "Your Court Login Credentials",
-            text: `You have been added as ${role} in court ${court.name}.
+            text: `You are seleted at  ${role} in court ${court.name} and we are immedieately trying to call you please 
+            response us other we will reach you 
+            call on this 0180-2652200.
 Email: ${email}
 Password: ${pass}
 
